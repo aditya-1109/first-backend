@@ -36,6 +36,10 @@ cron.schedule("0 0 * * *", async()=>{
    
 })
 
+app.get("/", (req, res)=>{
+    res.send("hello");
+})
+
 app.post("/registerUser", async (req, res) => {
     const { name, email, password, mobileNumber } = req.body;
 
