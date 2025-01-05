@@ -14,8 +14,16 @@ const app= express();
 const port= process.env.PORT;
 app.use(express.urlencoded({extended: false}));
 app.use(cors({
-    origin: 'https://first-rho-ecru.vercel.app'
+    origin: 'https://first-rho-ecru.vercel.app', 
+    methods: 'GET, POST, PUT, DELETE, OPTIONS', 
+    allowedHeaders: 'Content-Type, Authorization', 
+    credentials: true, 
 }));
+
+app.options('*', cors()); 
+
+
+
 app.use(express.json())
 mongoose.connect(process.env.MongoLink);
 
