@@ -12,7 +12,7 @@ dotenv.config()
 
 const app= express();
 const port= process.env.PORT;
-app.use(express.urlencoded({extended: false}));
+
 app.use(cors({
     origin: 'https://first-rho-ecru.vercel.app', 
     methods: 'GET, POST, PUT, DELETE, OPTIONS', 
@@ -23,9 +23,18 @@ app.use(cors({
 app.options('*', cors()); 
 
 
-
+app.use(express.urlencoded({extended: false}));
 app.use(express.json())
 mongoose.connect(process.env.MongoLink);
+
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'https://first-rho-ecru.vercel.app');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    next();
+});
+
 
 cron.schedule("0 0 * * *", async()=>{
 
