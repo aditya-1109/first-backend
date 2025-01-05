@@ -228,6 +228,4 @@ app.post("/setBet",async(req,res)=>{
 })
 
 
-app.listen(port, ()=>{
-    console.log(`app is listening at ${port}`);
-})
+export default app;
