@@ -87,7 +87,7 @@ app.post("/registerUser", async (req, res) => {
         res.status(200).send({ success: true, message: "Successfully registered." });
     } catch (error) {
         console.error("Error in registration:", error);
-        res.status(500).send({ success: false, message: "Could not register. Please try again later." });
+        res.status(200).send({ success: false, message: "Could not register. Please try again later." });
     }
 });
 
