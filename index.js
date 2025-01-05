@@ -5,7 +5,7 @@ import { lotteryModel } from "./lotterySchema.js";
 import { data } from "./lotteryModel.js";
 import cron from "node-cron";
 import { userModel } from "./userSchema.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 
 dotenv.config()
