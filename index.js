@@ -13,7 +13,9 @@ dotenv.config()
 const app= express();
 const port= process.env.PORT;
 app.use(express.urlencoded({extended: false}));
-app.use(cors())
+app.use(cors({
+    origin: 'https://first-rho-ecru.vercel.app'
+}));
 app.use(express.json())
 mongoose.connect(process.env.MongoLink);
 
