@@ -13,12 +13,7 @@ dotenv.config()
 const app= express();
 const port= process.env.PORT;
 
-app.use(cors({
-    origin: 'https://first-rho-ecru.vercel.app', 
-    methods: 'GET, POST, PUT, DELETE, OPTIONS', 
-    allowedHeaders: 'Content-Type, Authorization', 
-    credentials: true, 
-}));
+app.use(cors());
 
 app.options('*', cors()); 
 
