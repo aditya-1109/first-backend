@@ -7,6 +7,7 @@ import cron from "node-cron";
 import { userModel } from "./userSchema.js";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
+import errorHandler from "./errorHandler.js";
 
 dotenv.config()
 
@@ -51,7 +52,7 @@ cron.schedule("0 0 * * *", async()=>{
 })
 
 app.get("/", (req, res)=>{
-    res.send("hello");
+    res.status(200).send("hello");
 })
 
 app.post("/registerUser", async (req, res) => {
@@ -158,7 +159,7 @@ app.post("/updateUser", async(req, res)=>{
             }
             if(password){
                 if(password==="galiDeshawarAdmin@2025"){
-                    res.send({success: false, message: "could not get this password"})
+                    res.status(200).send({success: false, message: "could not get this password"})
                 }else{
                 const salt = await bcrypt.genSalt(10);
                 user.password= await bcrypt.hash(password, salt);
@@ -236,7 +237,7 @@ app.get("/lotteryData", async(req, res)=>{
     if(response.length===0){
         response= await lotteryModel.insertMany(data);
     }
-    res.send(response);
+    res.status(200).send(response);
 
 });
 
@@ -278,12 +279,13 @@ app.post("/setBet",async(req,res)=>{
             user.bet.push(singleBet); 
         });
         await user.save();
-        res.send({success:true, message:"Bet placed"})
+        res.status(200).send({success:true, message:"Bet placed"})
     }else{
-        res.send({success:false, message:"User not found"})
+        res.status(200).send({success:false, message:"User not found"})
     }
 })
 
+app.use(errorHandler);
 
 app.listen(port, ()=>{
     console.log(`app is listening on ${port}`)
