@@ -14,7 +14,7 @@ const userSchema= mongoose.Schema({
             digit:{type: Number},
         }
     ],
-    wallet:{type: Number},
+    wallet:{type: Number, default: 0},
 });
 
 export const userModel= mongoose.model("user", userSchema);
