@@ -95,6 +95,45 @@ app.post("/registerUser", async (req, res) => {
     }
 });
 
+
+app.post("/transferAmount", async (req, res) => {
+    const { number, myNumber, amount } = req.body;
+
+    if (!number || !myNumber || !amount || amount <= 0) {
+        return res.status(400).send({ success: false, message: "Invalid input data" });
+    }
+
+    try {
+
+        const me = await userModel.findOne({ number: myNumber });
+        const user = await userModel.findOne({ number });
+
+        if (!me) {
+            return res.status(404).send({ success: false, message: "Sender not found" });
+        }
+
+        if (!user) {
+            return res.status(404).send({ success: false, message: "Receiver not found" });
+        }
+
+        if (me.wallet < amount) {
+            return res.status(400).send({ success: false, message: "Insufficient balance" });
+        }
+
+        me.wallet -= amount;
+        user.wallet += amount;
+
+        await me.save();
+        await user.save();
+
+        res.status(200).send({ success: true, message: "Successfully transferred" });
+    } catch (error) {
+        console.error("Error in transferAmount:", error);
+        res.status(500).send({ success: false, message: "An error occurred", error: error.message });
+    }
+});
+
+
 app.post("/updateUser", async(req, res)=>{
     const {number, name, email, password, mobile}= req.body;
 
