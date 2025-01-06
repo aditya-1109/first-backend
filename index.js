@@ -192,7 +192,11 @@ app.post("/verifyUser", async (req, res) => {
 
 
 app.get("/lotteryData", async(req, res)=>{
-    const response= await lotteryModel.find();
+    let response;
+    response= await lotteryModel.find();
+    if(response.length===0){
+        response= await lotteryModel.insertMany(data);
+    }
     res.send(response);
 
 });
