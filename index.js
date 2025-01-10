@@ -306,28 +306,46 @@ app.post("/submitData", async (req, res) => {
                         $match: {
                             "bet.betName": lotteryName,
                             "bet.betType": type,
-                            "bet.digit": digit,
-                            "bet.status": false
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: "$name",
-                            totalAmount: { $sum: "$bet.amount" }
-                        }
-                    },
-                    {
-                        $project: {
-                            name: "$_id",
-                            totalAmount: 1
+                            "bet.status": false,
+                            $expr: {
+                                $eq: [
+                                    "$bet.digit",
+                                    { $toInt: { $divide: [digit, 100] } }
+                                ]
+                            }
                         }
                     }
                 ]);
         
-                await giveMoney(winners, lotteryName);
+                for (const winner of winners) {
+                    const { _id, bet } = winner;
+        
+                    
+                    const user = await userModel.findById(_id);
+                    let updated = false;
+        
+                    for (const userBet of user.bet) {
+                        if (
+                            userBet.betName === lotteryName &&
+                            userBet.betType === type &&
+                            userBet.digit === parseInt(digit/100) &&
+                            userBet.bidName === "oddeven" &&
+                            !userBet.status
+                        ) {
+                            const winnings = userBet.amount * 9.6;
+                            user.wallet += winnings;
+                            userBet.status = true;
+                            updated = true;
+                        }
+                    }
+        
+                    if (updated) {
+                        await user.save();
+                    }
+                }
             }
-        };        
-       
+        };
+        
 
         await updateWinningNumber("open", lotteryData.open);
         await updateWinningNumber("jodi", lotteryData.jodi);
