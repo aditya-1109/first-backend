@@ -32,43 +32,6 @@ app.use((req, res, next) => {
 });
 
 
-const updateWinningNumber = async (type, digit, winningNumberEntry, lotteryName) => {
-    if (digit) {
-        winningNumberEntry[type] = digit;
-        if (type === "close") {
-            winningNumberEntry.status = "CLOSED";
-        } else if (type === "open") {
-            winningNumberEntry.status = "OPENED";
-        }
-
-        const winners = await userModel.aggregate([
-            { $unwind: "$bet" },
-            {
-                $match: {
-                    "bet.betName": lotteryName,
-                    "bet.betType": type,
-                    "bet.digit": digit,
-                    "bet.status": false
-                }
-            },
-            {
-                $group: {
-                    _id: "$name",
-                    totalAmount: { $sum: "$bet.amount" }
-                }
-            },
-            {
-                $project: {
-                    name: "$_id",
-                    totalAmount: 1
-                }
-            }
-        ]);
-
-        await giveMoney(winners, lotteryName);
-    }
-};
-
 
 
 cron.schedule("0 0 * * *", async()=>{
@@ -328,11 +291,47 @@ app.post("/submitData", async (req, res) => {
             return res.status(404).send({ success: false, message: "Winning entry for the current date not found." });
         }
 
+        const updateWinningNumber = async (type, digit) => {
+            if (digit) {
+                winningNumberEntry[type] = digit;
+                if (type === "close") {
+                    winningNumberEntry.status = "CLOSED";
+                } else if (type === "open") {
+                    winningNumberEntry.status = "OPENED";
+                }
+        
+                const winners = await userModel.aggregate([
+                    { $unwind: "$bet" },
+                    {
+                        $match: {
+                            "bet.betName": lotteryName,
+                            "bet.betType": type,
+                            "bet.digit": digit,
+                            "bet.status": false
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$name",
+                            totalAmount: { $sum: "$bet.amount" }
+                        }
+                    },
+                    {
+                        $project: {
+                            name: "$_id",
+                            totalAmount: 1
+                        }
+                    }
+                ]);
+        
+                await giveMoney(winners, lotteryName);
+            }
+        };        
        
 
-        await updateWinningNumber("open", lotteryData.open, winningNumberEntry, lotteryName);
-        await updateWinningNumber("jodi", lotteryData.jodi, winningNumberEntry, lotteryName);
-        await updateWinningNumber("close", lotteryData.close, winningNumberEntry, lotteryName);
+        await updateWinningNumber("open", lotteryData.open);
+        await updateWinningNumber("jodi", lotteryData.jodi);
+        await updateWinningNumber("close", lotteryData.close);
 
         await findData.save();
         return res.status(200).send({ success: true, message: "Successfully updated." });
