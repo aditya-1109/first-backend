@@ -8,7 +8,7 @@ import { userModel } from "./userSchema.js";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import errorHandler from "./errorHandler.js";
-
+import { giveMoney } from "./giveMoney.js";
 dotenv.config()
 
 const app= express();

@@ -1,3 +1,3 @@
 export const giveMoney=(userDetail, bidName)=>{
-    return 1;
+    console.log(userDetail, bidName);
 }
