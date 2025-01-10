@@ -3,7 +3,6 @@ const day= dat.getDate();
 const month= dat.getMonth() +1;
 const date= `${day}/${month}`;
 
-
 export const data= [{ initialTime: "8:45", finalTime:"9:45", winningNumber: [{open: "***", jodi: "**", close: "***", date, status: "RUNNING"}], lotteryName: "MAHAKAL MORNING", RemainingTime:"00:00:00"},
     { initialTime: "9:00 am", finalTime:"10:00 am", winningNumber: [{open: "***", jodi: "**", close: "***", date, status: "RUNNING"}], lotteryName: "SRIDEVI MORNING", status: "RUNNING", RemainingTime:"00:00:00"},
     { initialTime: "9:30 am", finalTime:"10:30 am", winningNumber: [{open: "***", jodi: "**", close: "***", date, status: "RUNNING"}], lotteryName: "SUPREME MORNING", status: "RUNNING", RemainingTime:"00:00:00"},

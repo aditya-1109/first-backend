@@ -8,7 +8,7 @@ const lotterySchema= mongoose.Schema({
             open: {type:String},
             jodi: {type:String},
             close: {type: String},
-            date:{type: Date},
+            date:{type: String},
             status: {type: String},
         },
     ],
