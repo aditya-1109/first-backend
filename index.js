@@ -292,6 +292,7 @@ app.post("/submitData", async (req, res) => {
         }
 
         const updateWinningNumber = async (type, digit) => {
+            
             if (digit) {
                 winningNumberEntry[type] = digit;
                 if (type === "close") {
@@ -309,8 +310,8 @@ app.post("/submitData", async (req, res) => {
                             "bet.status": false,
                             $expr: {
                                 $eq: [
-                                    "$bet.digit",
-                                    { $toInt: { $divide: [digit, 100] } }
+                                    { $toInt: { $substr: [digit, 0, 1] } }, 
+                                    "$bet.digit" 
                                 ]
                             }
                         }
@@ -328,7 +329,7 @@ app.post("/submitData", async (req, res) => {
                         if (
                             userBet.betName === lotteryName &&
                             userBet.betType === type &&
-                            userBet.digit === parseInt(digit/100) &&
+                            userBet.digit === parseInt(digit.charAt(0)) &&
                             userBet.bidName === "oddeven" &&
                             !userBet.status
                         ) {
