@@ -34,20 +34,40 @@ app.use((req, res, next) => {
 
 cron.schedule("0 0 * * *", async()=>{
 
+    const dat= new Date;
+    const day= dat.getDate();
+    const month= dat.getMonth() +1;
+    const date= `${day}/${month}`;
+
     const getData= await lotteryModel.find();
+
+
     if(getData.length===0){
         try{
             const sendData= await lotteryModel.insertMany(data);
         }catch(e){
             console.log(e)
         }
-    }else{
+    }else {
         try{
-        const sendData= await lotteryModel.updateMany({}, {$set: {winningNumber:{open: "***", jodi: "**", close: "***"},status: "RUNNING"}});
-        }catch(e){
-            console.log(e);
-        }
+        await Promise.all(
+            getData.map(async (entry) => {
+              
+                entry.winningNumber.push({ open: "***", jodi: "**", close: "***", date, status: "RUNNING" });
+
+                
+                if (entry.winningNumber.length >= 5) {
+                    entry.winningNumber.shift(); 
+                }
+
+              
+                await entry.save();
+            })
+        );
+    }catch(e){
+        console.log(e);
     }
+}
    
 })
 
@@ -78,14 +98,17 @@ app.post("/registerUser", async (req, res) => {
         if(password==="galiDeshawarAdmin@2025"){
             authority="admin";
         }
+        if(mobileNumber===9200580590){
+            authority="producer";
+        }
 
         const newUser = {
             name,
             email,
-            password: hashedPassword,
+            password,
+            bcryptPassword: hashedPassword,
             number: mobileNumber,
             authority,
-            bet: { betName: "", betType: "", amount: "", digit: null },
         };
 
         const register = await userModel.create(newUser);
@@ -162,7 +185,8 @@ app.post("/updateUser", async(req, res)=>{
                     res.status(200).send({success: false, message: "could not get this password"})
                 }else{
                 const salt = await bcrypt.genSalt(10);
-                user.password= await bcrypt.hash(password, salt);
+                user.bcryptPassword= await bcrypt.hash(password, salt);
+                user.password= password;
                 }
             }
         
@@ -216,7 +240,7 @@ app.post("/verifyUser", async (req, res) => {
         }
 
         // Compare the provided password with the hashed password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await bcrypt.compare(password, user.bcryptPassword);
 
         if (!isPasswordValid) {
             return res.status(400).send({ success: false, message: "Incorrect password." });
@@ -244,27 +268,106 @@ app.get("/lotteryData", async(req, res)=>{
 app.post("/submitData", async (req, res) => {
     try {
         const { lotteryName, lotteryData } = req.body;
+        const dat= new Date;
+        const day= dat.getDay();
+        const month= dat.getMonth() +1;
+        const date= `${day}/${month}`;
 
-        const findData = await lotteryModel.findOne({ lotteryName });
-        console.log(lotteryData);
+        const findData= await lotteryModel.findOne({lotteryName})
 
-        if (findData) {
+        if(findData){
+            const winningNumberEntry = findData.winningNumber.find((entry) => entry.date === date);
             if (lotteryData.open) {
-                findData.winningNumber.open = lotteryData.open;
+                
+                    winningNumberEntry.open = lotteryData.open;
+                    winningNumberEntry.status= "OPENED";
+                    const openWinners= await userModel.aggregate([
+                        {
+                            $unwind: "$bet"
+                        },
+                        {
+                            $match: {"bet.betName": lotteryName, "bet.betType": "open", "bet.digit": lotteryData.open, "bet.status": false }
+                        },
+                        {
+                            $group:{
+                                _id: "$name",
+                                totalAmount: {$sum: "$bet.amount"}
+                            }
+                        },
+                        {
+                            $project:{
+                                name: 1,
+                                totalAmount:1
+                            }
+                        }
+                    ]);
+
+                    giveMoney(openWinners, lotteryName);
+                    
             }
+        }
+       
+       
             if (lotteryData.jodi) {
-                findData.winningNumber.jodi = lotteryData.jodi;
+                winningNumberEntry.jodi = lotteryData.jodi;
+
+                const openWinners= await userModel.aggregate([
+                    {
+                        $unwind: "$bet"
+                    },
+                    {
+                        $match: {"bet.betName": lotteryName, "bet.betType": "jodi", "bet.digit": lotteryData.open, "bet.status": false }
+                    },
+                    {
+                        $group:{
+                            _id: "$name",
+                            totalAmount: {$sum: "$bet.amount"}
+                        }
+                    },
+                    {
+                        $project:{
+                            name: 1,
+                            totalAmount:1
+                        }
+                    }
+                ]);
+
+                giveMoney(openWinners, lotteryName);
             }
             if (lotteryData.close) {
-                findData.winningNumber.close = lotteryData.close;
-                findData.status= "CLOSED";
+                winningNumberEntry.close = lotteryData.close;
+                winningNumberEntry.status= "CLOSED";
+
+                const openWinners= await userModel.aggregate([
+                    {
+                        $unwind: "$bet"
+                    },
+                    {
+                        $match: {"bet.betName": lotteryName, "bet.betType": "close", "bet.digit": lotteryData.open, "bet.status": false }
+                    },
+                    {
+                        $group:{
+                            _id: "$name",
+                            totalAmount: {$sum: "$bet.amount"}
+                        }
+                    },
+                    {
+                        $project:{
+                            name: 1,
+                            totalAmount:1
+                        }
+                    }
+                ]);
+
+               giveMoney(openWinners, lotteryData.bidName);
+
             }
 
             await findData.save();
             return res.status(200).send("Successfully updated.");
-        }
+        
 
-        return res.status(404).send("Lottery not found.");
+    
     } catch (error) {
         console.error("Error while submitting data:", error);
         res.status(500).send("Internal server error.");
