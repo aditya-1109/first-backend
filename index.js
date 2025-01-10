@@ -32,7 +32,7 @@ app.use((req, res, next) => {
 });
 
 
-const updateWinningNumber = async (type, digit) => {
+const updateWinningNumber = async (type, digit, winningNumberEntry) => {
     if (digit) {
         winningNumberEntry[type] = digit;
         if (type === "close") {
@@ -330,9 +330,9 @@ app.post("/submitData", async (req, res) => {
 
        
 
-        await updateWinningNumber("open", lotteryData.open);
-        await updateWinningNumber("jodi", lotteryData.jodi);
-        await updateWinningNumber("close", lotteryData.close);
+        await updateWinningNumber("open", lotteryData.open, winningNumberEntry);
+        await updateWinningNumber("jodi", lotteryData.jodi, winningNumberEntry);
+        await updateWinningNumber("close", lotteryData.close, winningNumberEntry);
 
         await findData.save();
         return res.status(200).send({ success: true, message: "Successfully updated." });
