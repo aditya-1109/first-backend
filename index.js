@@ -32,6 +32,45 @@ app.use((req, res, next) => {
 });
 
 
+const updateWinningNumber = async (type, digit) => {
+    if (digit) {
+        winningNumberEntry[type] = digit;
+        if (type === "close") {
+            winningNumberEntry.status = "CLOSED";
+        } else if (type === "open") {
+            winningNumberEntry.status = "OPENED";
+        }
+
+        const winners = await userModel.aggregate([
+            { $unwind: "$bet" },
+            {
+                $match: {
+                    "bet.betName": lotteryName,
+                    "bet.betType": type,
+                    "bet.digit": digit,
+                    "bet.status": false
+                }
+            },
+            {
+                $group: {
+                    _id: "$name",
+                    totalAmount: { $sum: "$bet.amount" }
+                }
+            },
+            {
+                $project: {
+                    name: "$_id",
+                    totalAmount: 1
+                }
+            }
+        ]);
+
+        await giveMoney(winners, lotteryName);
+    }
+};
+
+
+
 cron.schedule("0 0 * * *", async()=>{
 
     const dat= new Date;
@@ -265,114 +304,43 @@ app.get("/lotteryData", async(req, res)=>{
 
 });
 
+
 app.post("/submitData", async (req, res) => {
     try {
         const { lotteryName, lotteryData } = req.body;
-        const dat= new Date;
-        const day= dat.getDay();
-        const month= dat.getMonth() +1;
-        const date= `${day}/${month}`;
 
-        const findData= await lotteryModel.findOne({lotteryName})
-
-        if(findData){
-            const winningNumberEntry = findData.winningNumber.find((entry) => entry.date === date);
-            if (lotteryData.open) {
-                
-                    winningNumberEntry.open = lotteryData.open;
-                    winningNumberEntry.status= "OPENED";
-                    const openWinners= await userModel.aggregate([
-                        {
-                            $unwind: "$bet"
-                        },
-                        {
-                            $match: {"bet.betName": lotteryName, "bet.betType": "open", "bet.digit": lotteryData.open, "bet.status": false }
-                        },
-                        {
-                            $group:{
-                                _id: "$name",
-                                totalAmount: {$sum: "$bet.amount"}
-                            }
-                        },
-                        {
-                            $project:{
-                                name: 1,
-                                totalAmount:1
-                            }
-                        }
-                    ]);
-
-                    giveMoney(openWinners, lotteryName);
-                    
-            }
+        if (!lotteryName || !lotteryData) {
+            return res.status(400).send({ success: false, message: "Invalid input data." });
         }
+
+        const currentDate = new Date();
+        const date = `${currentDate.getDate()}/${currentDate.getMonth() + 1}`;
+
+        const findData = await lotteryModel.findOne({ lotteryName });
+        if (!findData) {
+            return res.status(404).send({ success: false, message: "Lottery not found." });
+        }
+
+        const winningNumberEntry = findData.winningNumber.find(entry => entry.date === date);
+        if (!winningNumberEntry) {
+            return res.status(404).send({ success: false, message: "Winning entry for the current date not found." });
+        }
+
        
-       
-            if (lotteryData.jodi) {
-                winningNumberEntry.jodi = lotteryData.jodi;
 
-                const openWinners= await userModel.aggregate([
-                    {
-                        $unwind: "$bet"
-                    },
-                    {
-                        $match: {"bet.betName": lotteryName, "bet.betType": "jodi", "bet.digit": lotteryData.open, "bet.status": false }
-                    },
-                    {
-                        $group:{
-                            _id: "$name",
-                            totalAmount: {$sum: "$bet.amount"}
-                        }
-                    },
-                    {
-                        $project:{
-                            name: 1,
-                            totalAmount:1
-                        }
-                    }
-                ]);
+        await updateWinningNumber("open", lotteryData.open);
+        await updateWinningNumber("jodi", lotteryData.jodi);
+        await updateWinningNumber("close", lotteryData.close);
 
-                giveMoney(openWinners, lotteryName);
-            }
-            if (lotteryData.close) {
-                winningNumberEntry.close = lotteryData.close;
-                winningNumberEntry.status= "CLOSED";
-
-                const openWinners= await userModel.aggregate([
-                    {
-                        $unwind: "$bet"
-                    },
-                    {
-                        $match: {"bet.betName": lotteryName, "bet.betType": "close", "bet.digit": lotteryData.open, "bet.status": false }
-                    },
-                    {
-                        $group:{
-                            _id: "$name",
-                            totalAmount: {$sum: "$bet.amount"}
-                        }
-                    },
-                    {
-                        $project:{
-                            name: 1,
-                            totalAmount:1
-                        }
-                    }
-                ]);
-
-               giveMoney(openWinners, lotteryData.bidName);
-
-            }
-
-            await findData.save();
-            return res.status(200).send("Successfully updated.");
-        
-
-    
+        await findData.save();
+        return res.status(200).send({ success: true, message: "Successfully updated." });
     } catch (error) {
         console.error("Error while submitting data:", error);
-        res.status(500).send("Internal server error.");
+        res.status(500).send({ success: false, message: "Internal server error." });
     }
 });
+
+
 
 app.post("/setBet",async(req,res)=>{
     const {bet, number}= req.body;

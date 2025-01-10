@@ -1,3 +1,3 @@
-export const giveMoney=(userDetail, bidName)=>{
+export const giveMoney=async(userDetail, bidName)=>{
     console.log(userDetail, bidName);
 }
