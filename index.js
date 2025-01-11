@@ -330,12 +330,9 @@ app.post("/submitData", async (req, res) => {
             await giveMoney(lotteryName, "open", lotteryData.open, "singlepatti", 9.6, 1, 1);
             await giveMoney(lotteryName, "open", lotteryData.open, "singlepatti", 9.6, 2, 1);
             await giveMoney(lotteryName, "open", lotteryData.open, "doublepatti", 302, 0, 3);
-            await giveMoney(lotteryName, "open", lotteryData.open, "pannafamily", 151, 0, 3);
-            await giveMoney(lotteryName, "open", lotteryData.open, "cppanna", 151, 0, 3);
-            await giveMoney(lotteryName, "open", lotteryData.open, "spmotor", 151, 0, 3);
-            await giveMoney(lotteryName, "open", lotteryData.open,  "dpmotor", 302, 0, 3);
+            
         }
-        
+
         if(lotteryData.close){
             winningNumberEntry["close"]= lotteryData.close;
             winningNumberEntry.status= "CLOSED";
@@ -354,17 +351,8 @@ app.post("/submitData", async (req, res) => {
             await giveMoney(lotteryName, "close", lotteryData.close, "singlepatti", 9.6, 1, 1);
             await giveMoney(lotteryName, "close", lotteryData.close, "singlepatti", 9.6, 2, 1);
             await giveMoney(lotteryName, "close", lotteryData.close, "doublepatti", 302, 0, 3);
-            await giveMoney(lotteryName, "close", lotteryData.close, "pannafamily", 151, 0, 3);
-            await giveMoney(lotteryName, "close", lotteryData.close, "cppanna", 151, 0, 3);
-            await giveMoney(lotteryName, "close", lotteryData.close, "spmotor", 151, 0, 3);
-            await giveMoney(lotteryName, "close", lotteryData.close, "dpmotor", 302, 0, 3);
-        }
-
-        
-        
-                
-                
             
+        }
 
 
         await findData.save();
