@@ -268,6 +268,28 @@ app.get("/lotteryData", async(req, res)=>{
 });
 
 
+const calculateJodiFirstDigit = (open) => {
+    
+    const digitSum = open
+        .split("") 
+        .map(Number)
+        .reduce((sum, digit) => sum + digit, 0); 
+
+        const digit= digitSum.toString();
+
+        let firstDigit;
+
+        if(digit.length==1){
+            firstDigit = parseInt(digit.charAt(0));
+        }else{
+            firstDigit = parseInt(digit.charAt(2));
+        }
+    
+
+    return firstDigit;
+};
+
+
 app.post("/submitData", async (req, res) => {
     try {
         const { lotteryName, lotteryData } = req.body;
@@ -291,66 +313,59 @@ app.post("/submitData", async (req, res) => {
             return res.status(404).send({ success: false, message: "Winning entry for the current date not found." });
         }
 
-        const updateWinningNumber = async (type, digit) => {
-            
-            if (digit) {
-                winningNumberEntry[type] = digit;
-                if (type === "close") {
-                    winningNumberEntry.status = "CLOSED";
-                } else if (type === "open") {
-                    winningNumberEntry.status = "OPENED";
-                }
-        
-                const winners = await userModel.aggregate([
-                    { $unwind: "$bet" },
-                    {
-                        $match: {
-                            "bet.betName": lotteryName,
-                            "bet.betType": type,
-                            "bet.status": false,
-                            $expr: {
-                                $eq: [
-                                    { $toInt: { $substr: [digit, 0, 1] } }, 
-                                    "$bet.digit" 
-                                ]
-                            }
-                        }
-                    }
-                ]);
-        
-                for (const winner of winners) {
-                    const { _id, bet } = winner;
-        
-                    
-                    const user = await userModel.findById(_id);
-                    let updated = false;
-        
-                    for (const userBet of user.bet) {
-                        if (
-                            userBet.betName === lotteryName &&
-                            userBet.betType === type &&
-                            userBet.digit === parseInt(digit.charAt(0)) &&
-                            userBet.bidName === "oddeven" &&
-                            !userBet.status
-                        ) {
-                            const winnings = userBet.amount * 9.6;
-                            user.wallet += winnings;
-                            userBet.status = true;
-                            updated = true;
-                        }
-                    }
-        
-                    if (updated) {
-                        await user.save();
-                    }
-                }
-            }
-        };
-        
+        let jodiDigit="--";
 
-        await updateWinningNumber("open", lotteryData.open);
-        await updateWinningNumber("jodi", lotteryData.jodi);
-        await updateWinningNumber("close", lotteryData.close);
+        if(lotteryData.open){
+            winningNumberEntry["open"]= lotteryData.open;
+            winningNumberEntry.status= "OPENED";
+            const firstNumber= calculateJodiFirstDigit(lotteryData.open);
+            jodiDigit.charAt(0)= firstNumber;
+
+            await giveMoney(lotteryName, "open", lotteryData.open, "oddeven", 9.6, 0, 1);
+            await giveMoney(lotteryName, "open", lotteryData.open, "singledigit", 9.6, 2, 1);
+            await giveMoney(lotteryName, "open", lotteryData.open, "singlepanna", 151, 0, 3);
+            await giveMoney(lotteryName, "open", lotteryData.open, "doublepanna", 302, 0, 3);
+            await giveMoney(lotteryName, "open", lotteryData.open, "triplepanna", 700, 0, 3);
+            await giveMoney(lotteryName, "open", lotteryData.open, "singlepatti", 9.6, 0, 1);
+            await giveMoney(lotteryName, "open", lotteryData.open, "singlepatti", 9.6, 1, 1);
+            await giveMoney(lotteryName, "open", lotteryData.open, "singlepatti", 9.6, 2, 1);
+            await giveMoney(lotteryName, "open", lotteryData.open, "doublepatti", 302, 0, 3);
+            await giveMoney(lotteryName, "open", lotteryData.open, "pannafamily", 151, 0, 3);
+            await giveMoney(lotteryName, "open", lotteryData.open, "cppanna", 151, 0, 3);
+            await giveMoney(lotteryName, "open", lotteryData.open, "spmotor", 151, 0, 3);
+            await giveMoney(lotteryName, "open", lotteryData.open,  "dpmotor", 302, 0, 3);
+        }
+        
+        if(lotteryData.close){
+            winningNumberEntry["close"]= lotteryData.close;
+            winningNumberEntry.status= "CLOSED";
+            const secondNumber= calculateJodiFirstDigit(lotteryData.open);
+            jodiDigit.charAt(1)= secondNumber;
+
+            await giveMoney(lotteryName, "jodi", jodiDigit, "jodidight", 96, 0, 2);
+            await giveMoney(lotteryName, "jodi", jodiDigit, "redbracket", 96, 0, 2);
+            await giveMoney(lotteryName, "jodi", jodiDigit, "jodifamily", 96, 0, 2);
+
+            await giveMoney(lotteryName, "close", lotteryData.close, "oddeven", 9.6, 0, 1);
+            await giveMoney(lotteryName, "close", lotteryData.close, "singledigit", 9.6, 2, 1);
+            await giveMoney(lotteryName, "close", lotteryData.close, "doublepanna", 302, 0, 3);
+            await giveMoney(lotteryName, "close", lotteryData.close, "triplepanna", 700, 0, 3);
+            await giveMoney(lotteryName, "close", lotteryData.close, "singlepatti", 9.6, 0, 1);
+            await giveMoney(lotteryName, "close", lotteryData.close, "singlepatti", 9.6, 1, 1);
+            await giveMoney(lotteryName, "close", lotteryData.close, "singlepatti", 9.6, 2, 1);
+            await giveMoney(lotteryName, "close", lotteryData.close, "doublepatti", 302, 0, 3);
+            await giveMoney(lotteryName, "close", lotteryData.close, "pannafamily", 151, 0, 3);
+            await giveMoney(lotteryName, "close", lotteryData.close, "cppanna", 151, 0, 3);
+            await giveMoney(lotteryName, "close", lotteryData.close, "spmotor", 151, 0, 3);
+            await giveMoney(lotteryName, "close", lotteryData.close, "dpmotor", 302, 0, 3);
+        }
+
+        
+        
+                
+                
+            
+
 
         await findData.save();
         return res.status(200).send({ success: true, message: "Successfully updated." });
