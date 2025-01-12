@@ -369,9 +369,14 @@ app.post("/setBet",async(req,res)=>{
     const {bet, number}= req.body;
     const user= await userModel.findOne({number});
     if(user){
+        let total=0;
         bet.forEach((singleBet) => {
+            if(singleBet.amount!==""){
             user.bet.push(singleBet); 
+            total+=singleBet.amount;
+            }
         });
+        user.wallet-=total;
         await user.save();
         res.status(200).send({success:true, message:"Bet placed"})
     }else{
