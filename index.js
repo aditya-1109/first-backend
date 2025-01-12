@@ -249,10 +249,10 @@ app.post("/verifyUser", async (req, res) => {
         }
 
         // If password is valid, send success response
-        res.status(200).send({ success: true, message: "User verified." });
+        res.status(200).send({ success: true, message: "User verified.", user });
     } catch (error) {
         console.error("Error during verification:", error);
-        res.status(500).send({ success: false, message: "An error occurred. Please try again later." });
+        res.status(500).send({ success: false, message: "An error occurred. Please try again later.", user: null });
     }
 });
 
