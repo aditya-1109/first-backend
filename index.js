@@ -34,12 +34,14 @@ app.use((req, res, next) => {
 
 
 
-cron.schedule("20 21 * * *", async()=>{
+cron.schedule("30 21 * * *", async()=>{
 
     const dat= new Date;
     const day= dat.getDate();
     const month= dat.getMonth() +1;
     const date= `${day}/${month}`;
+
+    console.log(date);
 
     const getData= await lotteryModel.find();
 
@@ -71,7 +73,7 @@ cron.schedule("20 21 * * *", async()=>{
     }
 }
    
-})
+}, {timezone: "Asia/Kolkata"})
 
 app.get("/", (req, res)=>{
     res.status(200).send("hello");
