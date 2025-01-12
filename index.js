@@ -206,7 +206,7 @@ app.post("/updateUser", async(req, res)=>{
 app.post("/getUser", async(req, res)=>{
     const {number}= req.body;
     try{
-        const user=await userModel.findOne({number});
+        const user=await userModel.findOne({bcryptPassword:number});
         res.status(200).send({success:true, user});
     }catch(e){
         res.status(400).send({success:false, user:""});
