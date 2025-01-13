@@ -64,12 +64,9 @@ export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidT
       
       const extraConditions = isHalfSangam
         ? {
-            $expr: {
-              $and: [
-                { $eq: [{ $toInt: openDigit }, "$bet.digit"] },
-                { $eq: [{ $toInt: { $substr: [closeDigit, 1, 1] } }, "$bet.sangam"] },
-              ],
-            },
+            $expr: 
+                { $eq: [{ $toInt: openDigit }, "$bet.digit"] }
+              
           }
         : {
             $expr: {
