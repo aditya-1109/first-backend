@@ -10,6 +10,7 @@ const lotterySchema= mongoose.Schema({
             close: {type: String},
             date:{type: String},
             status: {type: String},
+            sangam: {type: Number}
         },
     ],
     lotteryName: {type: String},
