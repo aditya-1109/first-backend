@@ -300,9 +300,9 @@ const calculateJodiFirstDigit = (open) => {
     let firstDigit;
 
     if (digit.length == 1) {
-        firstDigit = parseInt(digit.charAt(0));
+        firstDigit = digit.charAt(0);
     } else {
-        firstDigit = parseInt(digit.charAt(2));
+        firstDigit = digit.charAt(1);
     }
 
 
