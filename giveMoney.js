@@ -50,7 +50,7 @@ export const giveMoney = async (lotteryName, type, digit, bidType, multiplier, d
     }
 };
 
-export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidType, betType, multiplier ) => {
+export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidType, betType, multiplier, index ) => {
     try {
       const isHalfSangam = bidType === "halfsangam";
 
@@ -64,9 +64,12 @@ export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidT
       
       const extraConditions = isHalfSangam
         ? {
-            $expr: 
-                { $eq: [{ $toInt: openDigit }, "$bet.digit"] }
-              
+            $expr: {
+              $and: [
+                { $eq: [{ $toInt: openDigit }, "$bet.digit"] },
+                { $eq: [{ $toInt: { $substr: [closeDigit, index, 1] } }, "$bet.sangam"] },
+              ],
+            },
           }
         : {
             $expr: {
@@ -82,13 +85,13 @@ export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidT
         { $match: { ...baseMatchConditions, ...extraConditions } },
       ]);
 
+  
 
 
       for (const winner of winners) {
         const { _id } = winner;
   
         const user = await userModel.findById(_id);
-        console.log("user:", user)
         if (!user) {
           console.warn(`User with ID ${_id} not found`);
           continue;
@@ -98,20 +101,17 @@ export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidT
   
         // Iterate through bets and update the winning ones
         for (const userBet of user.bet) {
-
-          console.log(userBet.sangam, parseInt(closeDigit.charAt(2)));
           const isWinningBet =
             userBet.betName === lotteryName &&
             userBet.betType === betType &&
             userBet.digit === parseInt(openDigit) &&
             userBet.sangam ===
-              (isHalfSangam ? parseInt(closeDigit.charAt(2)) : parseInt(closeDigit)) &&
+              (isHalfSangam ? parseInt(closeDigit.charAt(index)) : parseInt(closeDigit)) &&
             userBet.bidName === bidType &&
             !userBet.status;
   
           if (isWinningBet) {
             const winnings = userBet.amount * multiplier;
-           
             user.wallet += winnings;
             userBet.status = true;
             updated = true;
