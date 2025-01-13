@@ -54,7 +54,7 @@ export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidT
     try {
       const isHalfSangam = bidType === "halfsangam";
   
-      
+      console.log(lotteryName, closeDigit, openDigit, bidType, betType, multiplier)
       const baseMatchConditions = {
         "bet.betName": lotteryName,
         "bet.betType": betType,
@@ -68,7 +68,7 @@ export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidT
             $expr: {
               $and: [
                 { $eq: [{ $toInt: openDigit }, "$bet.digit"] },
-                { $eq: [{ $toInt: { $substr: [closeDigit, index, 1] } }, "$bet.sangam"] },
+                { $eq: [{ $toInt: { $substr: [closeDigit, 2, 1] } }, "$bet.sangam"] },
               ],
             },
           }
