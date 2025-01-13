@@ -349,10 +349,12 @@ app.post("/submitData", async (req, res) => {
       // Process "open" data
       if (lotteryData.open) {
         winningNumberEntry.open = lotteryData.open;
+        
         winningNumberEntry.status = "OPENED";
         const firstNumber = calculateJodiFirstDigit(lotteryData.open);
-        jodiDigit = firstNumber + jodiDigit[1]; // Update first digit of jodi
-  
+        jodiDigit = firstNumber + jodiDigit[1]; 
+
+        winningNumberEntry.jodi = jodiDigit;
         // Payout for "open" bets
         await giveMoney(lotteryName, "open", lotteryData.open, "oddeven", 9.6, 0, 1);
         await giveMoney(lotteryName, "open", lotteryData.open, "singledigit", 9.6, 2, 1);
@@ -363,14 +365,15 @@ app.post("/submitData", async (req, res) => {
         await giveMoney(lotteryName, "open", lotteryData.open, "doublepatti", 302, 0, 3);
       }
   
-      // Process "close" data
+      
       if (lotteryData.close) {
         winningNumberEntry.close = lotteryData.close;
         winningNumberEntry.status = "CLOSED";
         const secondNumber = calculateJodiFirstDigit(lotteryData.close);
-        jodiDigit = jodiDigit[0] + secondNumber; // Update second digit of jodi
+        jodiDigit = jodiDigit[0] + secondNumber; 
+        winningNumberEntry.jodi = jodiDigit;
   
-        // Payout for "jodi" and "close" bets
+       
         await giveMoney(lotteryName, "jodi", jodiDigit, "jodidight", 96, 0, 2);
         await giveMoney(lotteryName, "jodi", jodiDigit, "redbracket", 96, 0, 2);
         await giveMoney(lotteryName, "jodi", jodiDigit, "jodifamily", 96, 0, 2);
