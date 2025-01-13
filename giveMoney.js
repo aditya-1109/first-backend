@@ -20,7 +20,6 @@ export const giveMoney = async (lotteryName, type, digit, bidType, multiplier, d
         }
     ]);
 
-    console.log(winners);
 
     for (const winner of winners) {
         const { _id } = winner;
@@ -38,7 +37,6 @@ export const giveMoney = async (lotteryName, type, digit, bidType, multiplier, d
                 !userBet.status
             ) {
                 const winnings = userBet.amount * multiplier;
-                console.log(winnings);
                 user.wallet += winnings;
                 userBet.status = true;
                 updated = true;
