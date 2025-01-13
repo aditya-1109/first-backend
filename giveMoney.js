@@ -88,6 +88,7 @@ export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidT
         const { _id } = winner;
   
         const user = await userModel.findById(_id);
+        console.log("user:", user)
         if (!user) {
           console.warn(`User with ID ${_id} not found`);
           continue;

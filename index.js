@@ -367,7 +367,6 @@ app.post("/submitData", async (req, res) => {
   
       
       if (lotteryData.close) {
-        console.log("lottery:", lotteryData.close);
         winningNumberEntry.close = lotteryData.close;
         winningNumberEntry.status = "CLOSED";
         const secondNumber = calculateJodiFirstDigit(lotteryData.close);
