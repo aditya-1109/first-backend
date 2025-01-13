@@ -23,7 +23,7 @@ export const giveMoney = async (lotteryName, type, digit, bidType, multiplier, d
     for (const winner of winners) {
         const { _id } = winner;
 
-       
+       console.log(winner);
         const user = await userModel.findById(_id);
         let updated = false;
 
