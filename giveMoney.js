@@ -100,9 +100,7 @@ export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidT
           const isWinningBet =
             userBet.betName === lotteryName &&
             userBet.betType === betType &&
-            parseInt(userBet.digit) === parseInt(openDigit) &&
-            parseInt(userBet.sangam) ===
-              (isHalfSangam ? parseInt(closeDigit.charAt(2)) : parseInt(closeDigit)) &&
+            userBet.digit === parseInt(openDigit) &&
             userBet.bidName === bidType &&
             !userBet.status;
   
