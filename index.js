@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import cors from "cors";
 import { lotteryModel } from "./lotterySchema.js";
 import { data } from "./lotteryModel.js";
-import cron from "node-cron";
 import { userModel } from "./userSchema.js";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
@@ -35,7 +34,7 @@ app.use((req, res, next) => {
 
 
 app.get("/", (req, res) => {
-    res.status(200).send("hello");
+    res.status(200).send("hiii");
 })
 
 app.post("/registerUser", async (req, res) => {
