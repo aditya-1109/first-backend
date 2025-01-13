@@ -97,16 +97,20 @@ export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidT
   
         // Iterate through bets and update the winning ones
         for (const userBet of user.bet) {
+
+          console.log(userBet.sangam, parseInt(closeDigit.charAt(2)));
           const isWinningBet =
             userBet.betName === lotteryName &&
             userBet.betType === betType &&
             userBet.digit === parseInt(openDigit) &&
+            userBet.sangam ===
+              (isHalfSangam ? parseInt(closeDigit.charAt(2)) : parseInt(closeDigit)) &&
             userBet.bidName === bidType &&
             !userBet.status;
   
           if (isWinningBet) {
             const winnings = userBet.amount * multiplier;
-            console.log(winnings);
+           
             user.wallet += winnings;
             userBet.status = true;
             updated = true;
