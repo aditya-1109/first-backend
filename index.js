@@ -326,14 +326,15 @@ app.post("/submitData", async (req, res) => {
             return res.status(404).send({ success: false, message: "Lottery not found." });
         }
 
-        console.log("findData:", findData);
+        
         const winningNumberEntry = findData.winningNumber.find(entry => entry.date === date);
-        console.log("winning: ", winningNumberEntry);
         if (!winningNumberEntry) {
             return res.status(404).send({ success: false, message: "Winning entry for the current date not found." });
         }
 
         let jodiDigit = "--";
+
+        console.log("lottery:", lotteryData);
 
         if (lotteryData.open) {
             winningNumberEntry["open"] = lotteryData.open;
