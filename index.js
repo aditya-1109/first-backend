@@ -383,11 +383,11 @@ app.post("/submitData", async (req, res) => {
 
 app.post("/setBet", async (req, res) => {
     const { bet, number } = req.body;
-    const user = await userModel.findOne({ number });
+    const user = await userModel.findOne({ bcryptPassword: number });
     if (user) {
         let total = 0;
-        bet.forEach((singleBet) => {
-            if (singleBet.amount !== "") {
+        user.bet.forEach((singleBet) => {
+            if (singleBet.amount !== "" && singleBet.amount >=10) {
                 user.bet.push(singleBet);
                 total += singleBet.amount;
             }
