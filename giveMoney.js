@@ -82,7 +82,6 @@ export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidT
         { $match: { ...baseMatchConditions, ...extraConditions } },
       ]);
 
-      console.log(winners);
 
 
       for (const winner of winners) {
@@ -109,6 +108,7 @@ export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidT
   
           if (isWinningBet) {
             const winnings = userBet.amount * multiplier;
+            console.log(winnings);
             user.wallet += winnings;
             userBet.status = true;
             updated = true;
