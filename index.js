@@ -334,10 +334,10 @@ app.post("/submitData", async (req, res) => {
 
         let jodiDigit = "--";
 
-        console.log("lottery:", lotteryData);
+        
 
         if (lotteryData.open) {
-            winningNumberEntry["open"] = lotteryData.open;
+            winningNumberEntry.open = lotteryData.open;
             winningNumberEntry.status = "OPENED";
             const firstNumber = calculateJodiFirstDigit(lotteryData.open);
             jodiDigit.charAt(0) = firstNumber;
