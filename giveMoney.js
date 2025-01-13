@@ -93,8 +93,10 @@ export const giveMoneyToSangam = async (
         { $unwind: "$bet" },
         { $match: { ...baseMatchConditions, ...extraConditions } },
       ]);
-  
-      // Process winners
+
+      console.log(winners);
+
+
       for (const winner of winners) {
         const { _id } = winner;
   
