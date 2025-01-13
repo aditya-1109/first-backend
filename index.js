@@ -370,7 +370,7 @@ app.post("/submitData", async (req, res) => {
         winningNumberEntry.close = lotteryData.close;
         winningNumberEntry.status = "CLOSED";
         const secondNumber = calculateJodiFirstDigit(lotteryData.close);
-        jodiDigit = jodiDigit[0] + secondNumber; 
+        jodiDigit = winningNumberEntry.jodi[0] + secondNumber; 
         winningNumberEntry.jodi = jodiDigit;
   
        
