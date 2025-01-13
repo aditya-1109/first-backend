@@ -374,9 +374,9 @@ app.post("/submitData", async (req, res) => {
         winningNumberEntry.jodi = jodiDigit;
   
        
-        await giveMoney(lotteryName, "jodi", jodiDigit, "jodidight", 96, 0, 2);
-        await giveMoney(lotteryName, "jodi", jodiDigit, "redbracket", 96, 0, 2);
-        await giveMoney(lotteryName, "jodi", jodiDigit, "jodifamily", 96, 0, 2);
+        await giveMoney(lotteryName, "open", jodiDigit, "jodidight", 96, 0, 2);
+        await giveMoney(lotteryName, "open", jodiDigit, "redbracket", 96, 0, 2);
+        await giveMoney(lotteryName, "open", jodiDigit, "jodifamily", 96, 0, 2);
   
         await giveMoney(lotteryName, "close", lotteryData.close, "oddeven", 9.6, 0, 1);
         await giveMoney(lotteryName, "close", lotteryData.close, "singleDigit", 9.6, 2, 1);
