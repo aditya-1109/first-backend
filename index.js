@@ -386,11 +386,11 @@ app.post("/submitData", async (req, res) => {
         await giveMoney(lotteryName, "close", lotteryData.close, "doublepatti", 302, 0, 3);
   
         
-        await giveMoneyToSangam(lotteryName, lotteryData.open, lotteryData.close, "halfsangam", "close", 1000, 0);
-        await giveMoneyToSangam(lotteryName, lotteryData.open, lotteryData.close, "fullsangam", "close", 10000, 0);
+        await giveMoneyToSangam(lotteryName, lotteryData.open, lotteryData.close, "halfsangam", "close", 1000 );
+        await giveMoneyToSangam(lotteryName, lotteryData.open, lotteryData.close, "fullsangam", "close", 10000 );
   
-        await giveMoneyToSangam(lotteryName, lotteryData.close, lotteryData.open, "halfsangam", "open", 1000, 2);
-        await giveMoneyToSangam(lotteryName, lotteryData.close, lotteryData.open, "fullsangam", "open", 10000, 2);
+        await giveMoneyToSangam(lotteryName, lotteryData.close, lotteryData.open, "halfsangam", "open", 1000 );
+        await giveMoneyToSangam(lotteryName, lotteryData.close, lotteryData.open, "fullsangam", "open", 10000 );
       }
   
       // Save updated data

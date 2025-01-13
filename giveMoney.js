@@ -50,15 +50,7 @@ export const giveMoney = async (lotteryName, type, digit, bidType, multiplier, d
     }
 };
 
-export const giveMoneyToSangam = async (
-    lotteryName,
-    closeDigit,
-    openDigit,
-    bidType,
-    betType,
-    multiplier,
-    index
-  ) => {
+export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidType, betType, multiplier ) => {
     try {
       const isHalfSangam = bidType === "halfsangam";
   
@@ -70,7 +62,7 @@ export const giveMoneyToSangam = async (
         "bet.bidName": bidType,
       };
   
-      // Add specific match conditions based on bidType
+      
       const extraConditions = isHalfSangam
         ? {
             $expr: {

@@ -14,7 +14,8 @@ const userSchema= mongoose.Schema({
             bidName: {type: String},
             amount: {type: Number},
             digit:{type: Number},
-            status: {type: Boolean, default: false}
+            status: {type: Boolean, default: false},
+            sangam: {type: Number}
         }
     ],
     wallet:{type: Number, default: 0},
