@@ -367,6 +367,7 @@ app.post("/submitData", async (req, res) => {
   
       
       if (lotteryData.close) {
+        console.log("lottery:", lotteryData.close);
         winningNumberEntry.close = lotteryData.close;
         winningNumberEntry.status = "CLOSED";
         const secondNumber = calculateJodiFirstDigit(lotteryData.close);
@@ -374,16 +375,16 @@ app.post("/submitData", async (req, res) => {
         winningNumberEntry.jodi = jodiDigit;
   
        
-        await giveMoney(lotteryName, "open", jodiDigit, "jodidight", 96, 0, 2);
-        await giveMoney(lotteryName, "open", jodiDigit, "redbracket", 96, 0, 2);
-        await giveMoney(lotteryName, "open", jodiDigit, "jodifamily", 96, 0, 2);
+        // await giveMoney(lotteryName, "open", jodiDigit, "jodidight", 96, 0, 2);
+        // await giveMoney(lotteryName, "open", jodiDigit, "redbracket", 96, 0, 2);
+        // await giveMoney(lotteryName, "open", jodiDigit, "jodifamily", 96, 0, 2);
   
-        await giveMoney(lotteryName, "close", lotteryData.close, "oddeven", 9.6, 0, 1);
-        await giveMoney(lotteryName, "close", lotteryData.close, "singleDigit", 9.6, 2, 1);
-        await giveMoney(lotteryName, "close", lotteryData.close, "doublepanna", 302, 0, 3);
-        await giveMoney(lotteryName, "close", lotteryData.close, "triplepanna", 700, 0, 3);
-        await giveMoney(lotteryName, "close", lotteryData.close, "singlepatti", 9.6, 0, 1);
-        await giveMoney(lotteryName, "close", lotteryData.close, "doublepatti", 302, 0, 3);
+        // await giveMoney(lotteryName, "close", lotteryData.close, "oddeven", 9.6, 0, 1);
+        // await giveMoney(lotteryName, "close", lotteryData.close, "singleDigit", 9.6, 2, 1);
+        // await giveMoney(lotteryName, "close", lotteryData.close, "doublepanna", 302, 0, 3);
+        // await giveMoney(lotteryName, "close", lotteryData.close, "triplepanna", 700, 0, 3);
+        // await giveMoney(lotteryName, "close", lotteryData.close, "singlepatti", 9.6, 0, 1);
+        // await giveMoney(lotteryName, "close", lotteryData.close, "doublepatti", 302, 0, 3);
   
         
         // await giveMoneyToSangam(lotteryName, winningNumberEntry.open, lotteryData.close, "halfsangam", "close", 1000 );
