@@ -1,3 +1,6 @@
+
+import { userModel } from "./userSchema.js";
+
 export const giveMoney = async (lotteryName, type, digit, bidType, multiplier, digitIndex, numbers) => {
     const winners = await userModel.aggregate([
         { $unwind: "$bet" },
