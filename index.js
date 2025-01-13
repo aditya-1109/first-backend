@@ -266,6 +266,16 @@ app.get("/lotteryData", async (req, res) => {
 
         // Fetch the updated data
         const updatedResponse = await lotteryModel.find();
+
+        const alluser= await userModel.find();
+        alluser.forEach((user)=>{
+            user.bet.forEach((bett)=>{
+                bett.status= true;
+            })
+        });
+
+        await alluser.save();
+
         return res.status(200).send(updatedResponse);
 
     } catch (error) {
@@ -382,11 +392,11 @@ app.post("/submitData", async (req, res) => {
 
 
 app.post("/setBet", async (req, res) => {
-    const { bet, number } = req.body;
+    const { fixBet, number } = req.body;
     const user = await userModel.findOne({ bcryptPassword: number });
     if (user) {
         let total = 0;
-        user.bet.forEach((singleBet) => {
+        fixBet.forEach((singleBet) => {
             if (singleBet.amount !== "" && singleBet.amount >=10) {
                 user.bet.push(singleBet);
                 total += singleBet.amount;
