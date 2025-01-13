@@ -67,7 +67,7 @@ export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidT
             $expr: {
               $and: [
                 { $eq: [{ $toInt: openDigit }, "$bet.digit"] },
-                { $eq: [{ $toInt: { $substr: [closeDigit, 2, 1] } }, "$bet.sangam"] },
+                { $eq: [{ $toInt: { $substr: [closeDigit, 1, 1] } }, "$bet.sangam"] },
               ],
             },
           }
