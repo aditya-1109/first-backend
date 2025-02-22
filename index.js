@@ -24,7 +24,7 @@ app.use(express.json())
 mongoose.connect(process.env.MongoLink);
 
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'https://first-vit2.vercel.app');
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.galideshawar.com');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -40,7 +40,7 @@ app.get("/", (req, res) => {
 app.post("/registerUser", async (req, res) => {
     const { name, email, password, mobileNumber } = req.body;
 
-
+    console.log(name, email, password, mobileNumber);
     if (!name || !email || !password || !mobileNumber) {
         return res.status(400).send({ success: false, message: "All fields are required." });
     }
