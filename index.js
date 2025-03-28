@@ -356,7 +356,7 @@ app.post("/submitData", async (req, res) => {
         winningNumberEntry.jodi = jodiDigit;
         // Payout for "open" bets
         await giveMoney(lotteryName, "open", lotteryData.open, "oddeven", 9.6, 0, 1);
-        await giveMoney(lotteryName, "open", lotteryData.open, "singleDigit", 9.6, 2, 1);
+        await giveMoney(lotteryName, "open", lotteryData.open, "singleDigit", 9.8, 2, 1);
         await giveMoney(lotteryName, "open", lotteryData.open, "singlepanna", 151, 0, 3);
         await giveMoney(lotteryName, "open", lotteryData.open, "doublepanna", 302, 0, 3);
         await giveMoney(lotteryName, "open", lotteryData.open, "triplepanna", 700, 0, 3);
