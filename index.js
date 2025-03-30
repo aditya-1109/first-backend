@@ -329,6 +329,22 @@ const calculateJodiFirstDigit = (open) => {
     return firstDigit;
 };
 
+app.post("/setStatus", async(req, res)=>{
+    const {lotteryName, typee}= req.body;
+    const dataa= await lotteryModel.findOne({lotteryName});
+    if(dataa){
+        if(typee==="open"){
+            dataa.winningNumber.status("OPENED");
+        }else if(typee==="close"){
+            dataa.winningNumber.status("CLOSED");
+        }
+        
+        await dataa.save();
+    }else{
+        console.log("could not find data");
+    }
+})
+
 app.post("/submitData", async (req, res) => {
     try {
       const { lotteryName, lotteryData } = req.body;
@@ -370,7 +386,6 @@ app.post("/submitData", async (req, res) => {
       if (lotteryData.open) {
         winningNumberEntry.open = lotteryData.open;
         
-        winningNumberEntry.status = "OPENED";
         const firstNumber = calculateJodiFirstDigit(lotteryData.open);
         jodiDigit = firstNumber + jodiDigit[1]; 
 
@@ -388,7 +403,7 @@ app.post("/submitData", async (req, res) => {
       
       if (lotteryData.close) {
         winningNumberEntry.close = lotteryData.close;
-        winningNumberEntry.status = "CLOSED";
+    
         const secondNumber = calculateJodiFirstDigit(lotteryData.close);
         jodiDigit = winningNumberEntry.jodi[0] + secondNumber; 
         winningNumberEntry.jodi = jodiDigit;
