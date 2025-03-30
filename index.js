@@ -8,6 +8,7 @@ import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import errorHandler from "./errorHandler.js";
 import { giveMoney, giveMoneyToSangam } from "./giveMoney.js";
+import { trackModel } from "./trackSchema.js";
 
 dotenv.config()
 
@@ -189,6 +190,8 @@ app.post("/setWallet", async (req, res) => {
         const user = await userModel.findOne({ number });
         if (user) {
             user.wallet = wallet;
+            const tracker={userName: user.name, number: user.number, time: Date.now(), amount: wallet}
+            const track= await trackModel.create(tracker)
             await user.save();
         }
 
