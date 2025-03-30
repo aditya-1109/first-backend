@@ -189,19 +189,27 @@ app.post("/setWallet", async (req, res) => {
     try {
         const user = await userModel.findOne({ number });
         if (user) {
+            const previousWallet = user.wallet; // Store previous wallet amount
             user.wallet = wallet;
-            const tracker={userName: user.name, number: user.number, time: Date.now(), amount: user.wallet-wallet}
-            const track= await trackModel.create(tracker)
+
+            const tracker = {
+                userName: user.name,
+                number: user.number,
+                time: Date.now(),
+                amount: wallet - previousWallet // Correct amount calculation
+            };
+
+            const track = await trackModel.create(tracker);
             await user.save();
         }
 
-        res.status(200).send({ success: true })
+        res.status(200).send({ success: true });
     } catch (e) {
-        res.status(400).send({ success: false });
+        console.error(e); // Log the error for debugging
+        res.status(400).send({ success: false, error: e.message });
     }
+});
 
-
-})
 
 app.post("/verifyUser", async (req, res) => {
     const { number, password } = req.body;
