@@ -190,7 +190,7 @@ app.post("/setWallet", async (req, res) => {
         const user = await userModel.findOne({ number });
         if (user) {
             user.wallet = wallet;
-            const tracker={userName: user.name, number: user.number, time: Date.now(), amount: wallet}
+            const tracker={userName: user.name, number: user.number, time: Date.now(), amount: user.wallet-wallet}
             const track= await trackModel.create(tracker)
             await user.save();
         }
