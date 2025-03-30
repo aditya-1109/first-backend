@@ -329,21 +329,41 @@ const calculateJodiFirstDigit = (open) => {
     return firstDigit;
 };
 
-app.post("/setStatus", async(req, res)=>{
-    const {lotteryName, typee}= req.body;
-    const dataa= await lotteryModel.findOne({lotteryName});
-    if(dataa){
-        if(typee==="open"){
-            dataa.winningNumber.status("OPENED");
-        }else if(typee==="close"){
-            dataa.winningNumber.status("CLOSED");
+app.post("/setStatus", async (req, res) => {
+    try {
+        const { lotteryName, typee } = req.body;
+
+        // Find the lottery entry
+        const dataa = await lotteryModel.findOne({ lotteryName });
+
+        if (!dataa) {
+            return res.status(404).json({ message: "Lottery data not found" });
         }
-        
+
+        // Ensure winningNumber exists before modifying it
+        if (!dataa.winningNumber) {
+            return res.status(400).json({ message: "Winning number data not found" });
+        }
+
+        // Update status based on typee
+        if (typee === "open") {
+            dataa.winningNumber.status = "OPENED";
+        } else if (typee === "close") {
+            dataa.winningNumber.status = "CLOSED";
+        } else {
+            return res.status(400).json({ message: "Invalid typee value" });
+        }
+
+        // Save the updated document
         await dataa.save();
-    }else{
-        console.log("could not find data");
+
+        res.status(200).json({ message: `Status updated to ${dataa.winningNumber.status}` });
+    } catch (error) {
+        console.error("Error updating status:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
-})
+});
+
 
 app.post("/submitData", async (req, res) => {
     try {
