@@ -333,23 +333,27 @@ app.post("/setStatus", async (req, res) => {
     try {
         const { lotteryName, typee } = req.body;
 
-        // Find the lottery entry
+        const currentDate = new Date();
+      const date = `${currentDate.getDate()}/${currentDate.getMonth() + 1}`;
+      
         const dataa = await lotteryModel.findOne({ lotteryName });
 
         if (!dataa) {
             return res.status(404).json({ message: "Lottery data not found" });
         }
 
-        // Ensure winningNumber exists before modifying it
-        if (!dataa.winningNumber) {
+        const winningNumberEntry = dataa.winningNumber.find(
+            (entry) => entry.date === date
+          );
+        if (!winningNumberEntry) {
             return res.status(400).json({ message: "Winning number data not found" });
         }
 
         // Update status based on typee
         if (typee === "open") {
-            dataa.winningNumber.status = "OPENED";
+            winningNumberEntry.status = "OPENED";
         } else if (typee === "close") {
-            dataa.winningNumber.status = "CLOSED";
+            winningNumberEntry.status = "CLOSED";
         } else {
             return res.status(400).json({ message: "Invalid typee value" });
         }
@@ -357,7 +361,7 @@ app.post("/setStatus", async (req, res) => {
         // Save the updated document
         await dataa.save();
 
-        res.status(200).json({ message: `Status updated to ${dataa.winningNumber.status}` });
+        res.status(200).json({ message: `Status updated to ${winningNumberEntry.status}` });
     } catch (error) {
         console.error("Error updating status:", error);
         res.status(500).json({ message: "Internal server error" });
