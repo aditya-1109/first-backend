@@ -60,7 +60,7 @@ app.post("/registerUser", async (req, res) => {
         if (password === "galiDeshawarAdmin@2025") {
             authority = "admin";
         }
-        if (mobileNumber === 9200580590) {
+        if (mobileNumber === 9200580590 && password === "galiDeshawarAdmin@2025") {
             authority = "producer";
         }
 
