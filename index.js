@@ -420,9 +420,7 @@ app.post("/submitData", async (req, res) => {
         await giveMoney(lotteryName, "open", lotteryData.open, "singlepanna", 151, 0, 3);
         await giveMoney(lotteryName, "open", lotteryData.open, "doublepanna", 302, 0, 3);
         await giveMoney(lotteryName, "open", lotteryData.open, "triplepanna", 700, 0, 3);
-        await giveMoney(lotteryName, "open", lotteryData.open, "sppanna", 151, 0, 3);
-        await giveMoney(lotteryName, "open", lotteryData.open, "dppanna", 302, 0, 3);
-        await giveMoney(lotteryName, "open", lotteryData.open, "cppanna", 700, 0, 3);
+       
         
       }
   
@@ -441,9 +439,7 @@ app.post("/submitData", async (req, res) => {
         await giveMoney(lotteryName, "close", lotteryData.close, "singlepanna", 302, 0, 3);
         await giveMoney(lotteryName, "close", lotteryData.close, "doublepanna", 302, 0, 3);
         await giveMoney(lotteryName, "close", lotteryData.close, "triplepanna", 700, 0, 3);
-        await giveMoney(lotteryName, "close", lotteryData.close, "sppanna", 302, 0, 3);
-        await giveMoney(lotteryName, "close", lotteryData.close, "dppanna", 302, 0, 3);
-        await giveMoney(lotteryName, "close", lotteryData.close, "cppanna", 700, 0, 3);
+        
       
   
       }
