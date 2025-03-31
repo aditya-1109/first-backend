@@ -415,13 +415,15 @@ app.post("/submitData", async (req, res) => {
 
         winningNumberEntry.jodi = jodiDigit;
         // Payout for "open" bets
-        await giveMoney(lotteryName, "open", lotteryData.open, "oddeven", 9.6, 0, 1);
-        await giveMoney(lotteryName, "open", lotteryData.open, "singleDigit", 9.8, 2, 1);
+    
+        await giveMoney(lotteryName, "open", jodiDigit, "singleDigit", 9.8, 0, 1);
         await giveMoney(lotteryName, "open", lotteryData.open, "singlepanna", 151, 0, 3);
         await giveMoney(lotteryName, "open", lotteryData.open, "doublepanna", 302, 0, 3);
         await giveMoney(lotteryName, "open", lotteryData.open, "triplepanna", 700, 0, 3);
-        await giveMoney(lotteryName, "open", lotteryData.open, "singlepatti", 9.6, 0, 1);
-        await giveMoney(lotteryName, "open", lotteryData.open, "doublepatti", 302, 0, 3);
+        await giveMoney(lotteryName, "open", lotteryData.open, "sppanna", 151, 0, 3);
+        await giveMoney(lotteryName, "open", lotteryData.open, "dppanna", 302, 0, 3);
+        await giveMoney(lotteryName, "open", lotteryData.open, "cppanna", 700, 0, 3);
+        
       }
   
       
@@ -434,26 +436,21 @@ app.post("/submitData", async (req, res) => {
   
        
         await giveMoney(lotteryName, "open", jodiDigit, "jodidight", 96, 0, 2);
-        await giveMoney(lotteryName, "open", jodiDigit, "redbracket", 96, 0, 2);
-        await giveMoney(lotteryName, "open", jodiDigit, "jodifamily", 96, 0, 2);
-  
-        await giveMoney(lotteryName, "close", lotteryData.close, "oddeven", 9.6, 0, 1);
-        await giveMoney(lotteryName, "close", lotteryData.close, "singleDigit", 9.6, 2, 1);
+        await giveMoney(lotteryName, "close", jodiDigit, "jodidight", 96, 0, 2);
+        await giveMoney(lotteryName, "close", jodiDigit, "singleDigit", 9.6, 1, 1);
+        await giveMoney(lotteryName, "close", lotteryData.close, "singlepanna", 302, 0, 3);
         await giveMoney(lotteryName, "close", lotteryData.close, "doublepanna", 302, 0, 3);
         await giveMoney(lotteryName, "close", lotteryData.close, "triplepanna", 700, 0, 3);
-        await giveMoney(lotteryName, "close", lotteryData.close, "singlepatti", 9.6, 0, 1);
-        await giveMoney(lotteryName, "close", lotteryData.close, "doublepatti", 302, 0, 3);
+        await giveMoney(lotteryName, "close", lotteryData.close, "sppanna", 302, 0, 3);
+        await giveMoney(lotteryName, "close", lotteryData.close, "dppanna", 302, 0, 3);
+        await giveMoney(lotteryName, "close", lotteryData.close, "cppanna", 700, 0, 3);
+      
   
-        
-        await giveMoneyToSangam(lotteryName, winningNumberEntry.open, lotteryData.close, "halfsangam", "close", 1000 , 0);
-        await giveMoneyToSangam(lotteryName, winningNumberEntry.open, lotteryData.close, "fullsangam", "close", 10000 , 0);
-  
-        await giveMoneyToSangam(lotteryName, lotteryData.close, winningNumberEntry.open, "halfsangam", "open", 1000, 2 );
-        await giveMoneyToSangam(lotteryName, lotteryData.close, winningNumberEntry.open, "fullsangam", "open", 10000, 2 );
       }
   
       // Save updated data
       await findData.save();
+    
   
       return res.status(200).send({
         success: true,
