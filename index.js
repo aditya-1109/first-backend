@@ -388,7 +388,7 @@ app.post("/submitData", async (req, res) => {
     // Fetch lottery data
     const findData = await lotteryModel.findOne({ lotteryName });
     if (!findData) {
-      return res.status(400).send({
+      return res.status(404).send({
         success: false,
         message: "Lottery not found.",
       });
@@ -401,7 +401,7 @@ app.post("/submitData", async (req, res) => {
 
     console.log(winningNumberEntry);
     if (!winningNumberEntry) {
-      return res.status(404).send({
+      return res.status(400).send({
         success: false,
         message: "Winning entry for the current date not found.",
       });
