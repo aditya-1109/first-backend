@@ -398,6 +398,7 @@ app.post("/submitData", async (req, res) => {
       (entry) => entry.date === date
     );
 
+    console.log(winningNumberEntry);
     if (!winningNumberEntry) {
       return res.status(404).send({
         success: false,
@@ -405,7 +406,7 @@ app.post("/submitData", async (req, res) => {
       });
     }
 
-    let jodiDigit = "";
+    let jodiDigit = "--";
 
     // Process "open" data
     if (lotteryData.open) {
