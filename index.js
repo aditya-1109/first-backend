@@ -370,10 +370,9 @@ app.post("/setStatus", async (req, res) => {
 
 
 app.post("/submitData", async (req, res) => {
-    const { lotteryName, lotteryData } = req.body;
-    console.log(lotteryName);
+  
     try {
-    
+    const { lotteryName, lotteryData } = req.body;
 
     // Validate input data
     if (!lotteryName || !lotteryData) {
@@ -389,7 +388,7 @@ app.post("/submitData", async (req, res) => {
     // Fetch lottery data
     const findData = await lotteryModel.findOne({ lotteryName });
     if (!findData) {
-      return res.status(404).send({
+      return res.status(400).send({
         success: false,
         message: "Lottery not found.",
       });
