@@ -399,9 +399,9 @@ app.post("/submitData", async (req, res) => {
       (entry) => entry.date === date
     );
 
-    console.log(winningNumberEntry);
+
     if (!winningNumberEntry) {
-      return res.status(400).send({
+      return res.status(404).send({
         success: false,
         message: "Winning entry for the current date not found.",
       });
@@ -420,12 +420,17 @@ app.post("/submitData", async (req, res) => {
       winningNumberEntry.jodi = jodiDigit;
 
       // Payout for "open" bets
-      await Promise.all([
-        giveMoney(lotteryName, "open", jodiDigit, "singleDigit", 9.8, 0, 1),
-        giveMoney(lotteryName, "open", lotteryData.open, "singlepanna", 151, 0, 3),
-        giveMoney(lotteryName, "open", lotteryData.open, "doublepanna", 302, 0, 3),
-        giveMoney(lotteryName, "open", lotteryData.open, "triplepanna", 700, 0, 3),
-      ]);
+      try {
+        await Promise.allSettled([
+          giveMoney(lotteryName, "open", jodiDigit, "singleDigit", 9.8, 0, 1),
+          giveMoney(lotteryName, "open", lotteryData.open, "singlepanna", 151, 0, 3),
+          giveMoney(lotteryName, "open", lotteryData.open, "doublepanna", 302, 0, 3),
+          giveMoney(lotteryName, "open", lotteryData.open, "triplepanna", 700, 0, 3),
+        ]);
+      } catch (error) {
+        console.error("Error in giveMoney:", error);
+      }
+      
     }
 
     // Process "close" data
@@ -438,15 +443,20 @@ app.post("/submitData", async (req, res) => {
 
       winningNumberEntry.jodi = jodiDigit;
 
-      // Payout for "close" bets
-      await Promise.all([
-        giveMoney(lotteryName, "open", jodiDigit, "jodiDigit", 96, 0, 2),
-        giveMoney(lotteryName, "close", jodiDigit, "jodiDigit", 96, 0, 2),
-        giveMoney(lotteryName, "close", jodiDigit, "singleDigit", 9.6, 1, 1),
-        giveMoney(lotteryName, "close", lotteryData.close, "singlepanna", 302, 0, 3),
-        giveMoney(lotteryName, "close", lotteryData.close, "doublepanna", 302, 0, 3),
-        giveMoney(lotteryName, "close", lotteryData.close, "triplepanna", 700, 0, 3),
-      ]);
+      
+      try {
+        await Promise.allSettled([
+            giveMoney(lotteryName, "open", jodiDigit, "jodiDigit", 96, 0, 2),
+            giveMoney(lotteryName, "close", jodiDigit, "jodiDigit", 96, 0, 2),
+            giveMoney(lotteryName, "close", jodiDigit, "singleDigit", 9.6, 1, 1),
+            giveMoney(lotteryName, "close", lotteryData.close, "singlepanna", 302, 0, 3),
+            giveMoney(lotteryName, "close", lotteryData.close, "doublepanna", 302, 0, 3),
+            giveMoney(lotteryName, "close", lotteryData.close, "triplepanna", 700, 0, 3),
+        ]);
+      } catch (error) {
+        console.error("Error in giveMoney:", error);
+      }
+      
     }
 
     // Save updated data
