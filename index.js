@@ -370,8 +370,10 @@ app.post("/setStatus", async (req, res) => {
 
 
 app.post("/submitData", async (req, res) => {
-  try {
     const { lotteryName, lotteryData } = req.body;
+    console.log(lotteryName);
+    try {
+    
 
     // Validate input data
     if (!lotteryName || !lotteryData) {
