@@ -370,96 +370,99 @@ app.post("/setStatus", async (req, res) => {
 
 
 app.post("/submitData", async (req, res) => {
-    try {
-      const { lotteryName, lotteryData } = req.body;
-  
-      // Validate input data
-      if (!lotteryName || !lotteryData) {
-        return res.status(400).send({
-          success: false,
-          message: "Invalid input data.",
-        });
-      }
-  
-      const currentDate = new Date();
-      const date = `${currentDate.getDate()}/${currentDate.getMonth() + 1}`;
-  
-      // Fetch lottery data
-      const findData = await lotteryModel.findOne({ lotteryName });
-      if (!findData) {
-        return res.status(404).send({
-          success: false,
-          message: "Lottery not found.",
-        });
-      }
-  
-      // Find the winning entry for the current date
-      const winningNumberEntry = findData.winningNumber.find(
-        (entry) => entry.date === date
-      );
-      if (!winningNumberEntry) {
-        return res.status(404).send({
-          success: false,
-          message: "Winning entry for the current date not found.",
-        });
-      }
-  
-      let jodiDigit = "--"; // Placeholder for jodi digits
-  
-      // Process "open" data
-      if (lotteryData.open) {
-        winningNumberEntry.open = lotteryData.open;
-        
-        const firstNumber = calculateJodiFirstDigit(lotteryData.open);
-        jodiDigit = firstNumber + jodiDigit[1]; 
+  try {
+    const { lotteryName, lotteryData } = req.body;
 
-        winningNumberEntry.jodi = jodiDigit;
-        // Payout for "open" bets
-    
-        await giveMoney(lotteryName, "open", jodiDigit, "singleDigit", 9.8, 0, 1);
-        await giveMoney(lotteryName, "open", lotteryData.open, "singlepanna", 151, 0, 3);
-        await giveMoney(lotteryName, "open", lotteryData.open, "doublepanna", 302, 0, 3);
-        await giveMoney(lotteryName, "open", lotteryData.open, "triplepanna", 700, 0, 3);
-       
-        
-      }
-  
-      
-      if (lotteryData.close) {
-        winningNumberEntry.close = lotteryData.close;
-    
-        const secondNumber = calculateJodiFirstDigit(lotteryData.close);
-        jodiDigit = winningNumberEntry.jodi[0] + secondNumber; 
-        winningNumberEntry.jodi = jodiDigit;
-  
-       
-        await giveMoney(lotteryName, "open", jodiDigit, "jodidight", 96, 0, 2);
-        await giveMoney(lotteryName, "close", jodiDigit, "jodidight", 96, 0, 2);
-        await giveMoney(lotteryName, "close", jodiDigit, "singleDigit", 9.6, 1, 1);
-        await giveMoney(lotteryName, "close", lotteryData.close, "singlepanna", 302, 0, 3);
-        await giveMoney(lotteryName, "close", lotteryData.close, "doublepanna", 302, 0, 3);
-        await giveMoney(lotteryName, "close", lotteryData.close, "triplepanna", 700, 0, 3);
-        
-      
-  
-      }
-  
-      // Save updated data
-      await findData.save();
-    
-  
-      return res.status(200).send({
-        success: true,
-        message: "Successfully updated.",
-      });
-    } catch (error) {
-      console.error("Error while submitting data:", error);
-      res.status(500).send({
+    // Validate input data
+    if (!lotteryName || !lotteryData) {
+      return res.status(400).send({
         success: false,
-        message: "Internal server error.",
+        message: "Invalid input data.",
       });
     }
-  });
+
+    const currentDate = new Date();
+    const date = `${currentDate.getDate()}/${currentDate.getMonth() + 1}`;
+
+    // Fetch lottery data
+    const findData = await lotteryModel.findOne({ lotteryName });
+    if (!findData) {
+      return res.status(404).send({
+        success: false,
+        message: "Lottery not found.",
+      });
+    }
+
+    // Find the winning entry for the current date
+    const winningNumberEntry = findData.winningNumber.find(
+      (entry) => entry.date === date
+    );
+
+    if (!winningNumberEntry) {
+      return res.status(404).send({
+        success: false,
+        message: "Winning entry for the current date not found.",
+      });
+    }
+
+    let jodiDigit = "";
+
+    // Process "open" data
+    if (lotteryData.open) {
+      winningNumberEntry.open = lotteryData.open;
+
+      // Calculate first digit of Jodi
+      const firstNumber = calculateJodiFirstDigit(lotteryData.open);
+      jodiDigit = firstNumber + (jodiDigit[1] || ""); // Ensure index exists
+
+      winningNumberEntry.jodi = jodiDigit;
+
+      // Payout for "open" bets
+      await Promise.all([
+        giveMoney(lotteryName, "open", jodiDigit, "singleDigit", 9.8, 0, 1),
+        giveMoney(lotteryName, "open", lotteryData.open, "singlepanna", 151, 0, 3),
+        giveMoney(lotteryName, "open", lotteryData.open, "doublepanna", 302, 0, 3),
+        giveMoney(lotteryName, "open", lotteryData.open, "triplepanna", 700, 0, 3),
+      ]);
+    }
+
+    // Process "close" data
+    if (lotteryData.close) {
+      winningNumberEntry.close = lotteryData.close;
+
+      // Calculate second digit of Jodi
+      const secondNumber = calculateJodiFirstDigit(lotteryData.close);
+      jodiDigit = (winningNumberEntry.jodi ? winningNumberEntry.jodi[0] : "0") + secondNumber;
+
+      winningNumberEntry.jodi = jodiDigit;
+
+      // Payout for "close" bets
+      await Promise.all([
+        giveMoney(lotteryName, "open", jodiDigit, "jodiDigit", 96, 0, 2),
+        giveMoney(lotteryName, "close", jodiDigit, "jodiDigit", 96, 0, 2),
+        giveMoney(lotteryName, "close", jodiDigit, "singleDigit", 9.6, 1, 1),
+        giveMoney(lotteryName, "close", lotteryData.close, "singlepanna", 302, 0, 3),
+        giveMoney(lotteryName, "close", lotteryData.close, "doublepanna", 302, 0, 3),
+        giveMoney(lotteryName, "close", lotteryData.close, "triplepanna", 700, 0, 3),
+      ]);
+    }
+
+    // Save updated data
+    await findData.save();
+
+    return res.status(200).send({
+      success: true,
+      message: "Successfully updated.",
+    });
+  } catch (error) {
+    console.error("Error while submitting data:", error);
+    res.status(500).send({
+      success: false,
+      message: "Internal server error.",
+    });
+  }
+});
+
   
 
 
