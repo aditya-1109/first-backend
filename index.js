@@ -333,40 +333,52 @@ app.post("/setStatus", async (req, res) => {
     try {
         const { lotteryName, typee } = req.body;
 
+        if (!lotteryName || !typee) {
+            return res.status(400).json({ message: "Missing required fields: lotteryName or typee" });
+        }
+
         const currentDate = new Date();
-      const date = `${currentDate.getDate()}/${currentDate.getMonth() + 1}`;
-      
+        const date = `${currentDate.getDate()}/${currentDate.getMonth() + 1}`;
+
+        // Fetch lottery data
         const dataa = await lotteryModel.findOne({ lotteryName });
 
         if (!dataa) {
             return res.status(404).json({ message: "Lottery data not found" });
         }
 
-        const winningNumberEntry = dataa.winningNumber.find(
-            (entry) => entry.date === date
-          );
+        // Find the winning entry for today
+        const winningNumberEntry = dataa.winningNumber.find(entry => entry.date === date);
         if (!winningNumberEntry) {
-            return res.status(400).json({ message: "Winning number data not found" });
+            return res.status(400).json({ message: "No winning number data found for today" });
         }
 
-        // Update status based on typee
-        if (typee === "open") {
+        // Ensure status exists
+        if (!winningNumberEntry.status) {
+            winningNumberEntry.status = "PENDING"; // Set a default if missing
+        }
+
+        const type = typee.trim().toLowerCase(); // Normalize input
+
+        // Update status based on type
+        if (type === "open" && winningNumberEntry.status !== "CLOSED") {
             winningNumberEntry.status = "OPENED";
-        } else if (typee === "close") {
+        } else if (type === "close" && winningNumberEntry.status !== "CLOSED") {
             winningNumberEntry.status = "CLOSED";
         } else {
-            return res.status(400).json({ message: "Invalid typee value" });
+            return res.status(400).json({ message: `Invalid type: '${typee}' or status is already CLOSED` });
         }
 
-        // Save the updated document
+        // Save updated data
         await dataa.save();
 
-        res.status(200).json({ message: `Status updated to ${winningNumberEntry.status}` });
+        res.status(200).json({ message: `Status updated successfully to ${winningNumberEntry.status}` });
     } catch (error) {
         console.error("Error updating status:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
 
 
 app.post("/submitData", async (req, res) => {
@@ -449,7 +461,7 @@ app.post("/submitData", async (req, res) => {
             giveMoney(lotteryName, "open", jodiDigit, "jodidigit", 96, 0, 2),
             giveMoney(lotteryName, "close", jodiDigit, "jodidigit", 96, 0, 2),
             giveMoney(lotteryName, "close", jodiDigit, "singledigit", 9.6, 1, 1),
-            giveMoney(lotteryName, "close", lotteryData.close, "singlepanna", 302, 0, 3),
+            giveMoney(lotteryName, "close", lotteryData.close, "singlepanna", 151, 0, 3),
             giveMoney(lotteryName, "close", lotteryData.close, "doublepanna", 302, 0, 3),
             giveMoney(lotteryName, "close", lotteryData.close, "triplepanna", 700, 0, 3),
         ]);
