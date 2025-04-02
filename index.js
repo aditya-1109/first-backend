@@ -363,7 +363,7 @@ app.post("/setStatus", async (req, res) => {
         // Update status based on type
         if (type === "open" && winningNumberEntry.status !== "CLOSED") {
             winningNumberEntry.status = "OPENED";
-        } else if (type === "close" && winningNumberEntry.status !== "CLOSED") {
+        } else if (type === "close" && winningNumberEntry.status === "OPENED") {
             winningNumberEntry.status = "CLOSED";
         } else {
             return res.status(400).json({ message: `Invalid type: '${typee}' or status is already CLOSED` });
