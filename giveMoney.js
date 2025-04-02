@@ -1,7 +1,7 @@
 
 import { userModel } from "./userSchema.js";
 
-export const giveMoney = async (lotteryName, type, digit, bidType, multiplier, digitIndex, numbers) => {
+export const giveMoney = async (lotteryName, type, digit, bidType, multiplier, digitIndex, numbers, date) => {
   try {
       const winners = await userModel.aggregate([
           { $unwind: "$bet" },
@@ -9,8 +9,8 @@ export const giveMoney = async (lotteryName, type, digit, bidType, multiplier, d
               $match: {
                   "bet.betName": lotteryName,
                   "bet.betType": type,
-                  "bet.status": false,
                   "bet.bidName": bidType,
+                  "bet.date": date, // Ensure date matches
                   $expr: {
                       $eq: [
                           { $toInt: { $substr: [digit, digitIndex, numbers] } }, 
@@ -33,31 +33,24 @@ export const giveMoney = async (lotteryName, type, digit, bidType, multiplier, d
           if (!user) continue; // Skip if user is not found
 
           let totalWinnings = 0;
-          let updated = false;
 
           for (const userBet of user.bet) {
               if (
                   userBet.betName === lotteryName &&
                   userBet.betType === type &&
+                  userBet.date === date && // Ensure date matches
                   (userBet.digit === parseInt(digit.charAt(digitIndex)) || userBet.digit === parseInt(digit)) &&
-                  userBet.bidName === bidType &&
-                  !userBet.status
+                  userBet.bidName === bidType
               ) {
-                  const winnings = userBet.amount * multiplier;
-                  totalWinnings += winnings; // Add to total winnings
-                  userBet.status = true;
-                  updated = true;
+                  totalWinnings += userBet.amount * multiplier; // Calculate total winnings
               }
           }
 
-          if (updated && totalWinnings > 0) {
+          if (totalWinnings > 0) {
               bulkOperations.push({
                   updateOne: {
                       filter: { _id: user._id },
-                      update: {
-                          $set: { bet: user.bet },
-                          $inc: { wallet: totalWinnings } // Add total winnings in one go
-                      }
+                      update: { $inc: { wallet: totalWinnings } } // Add winnings in one update
                   }
               });
           }
@@ -72,6 +65,7 @@ export const giveMoney = async (lotteryName, type, digit, bidType, multiplier, d
       console.error("Error in giveMoney:", error);
   }
 };
+
 
 export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidType, betType, multiplier, index ) => {
     try {

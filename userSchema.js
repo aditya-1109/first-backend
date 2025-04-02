@@ -15,7 +15,8 @@ const userSchema= mongoose.Schema({
             amount: {type: Number},
             digit:{type: Number},
             status: {type: Boolean, default: false},
-            sangam: {type: Number}
+            sangam: {type: Number},
+            date:{type: String},
         }
     ],
     wallet:{type: Number, default: 0},
