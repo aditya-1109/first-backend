@@ -434,10 +434,10 @@ app.post("/submitData", async (req, res) => {
       // Payout for "open" bets
       try {
         await Promise.all([
-          giveMoney(lotteryName, "open", jodiDigit, "singledigit", 9.8, 0, 1),
-          giveMoney(lotteryName, "open", lotteryData.open, "singlepanna", 151, 0, 3),
-          giveMoney(lotteryName, "open", lotteryData.open, "doublepanna", 302, 0, 3),
-          giveMoney(lotteryName, "open", lotteryData.open, "triplepanna", 700, 0, 3),
+          giveMoney(lotteryName, "open", jodiDigit, "singledigit", 9.8, 0, 1, date),
+          giveMoney(lotteryName, "open", lotteryData.open, "singlepanna", 151, 0, 3, date),
+          giveMoney(lotteryName, "open", lotteryData.open, "doublepanna", 302, 0, 3, date),
+          giveMoney(lotteryName, "open", lotteryData.open, "triplepanna", 700, 0, 3,date),
         ]);
       } catch (error) {
         console.error("Error in giveMoney:", error);
@@ -458,12 +458,12 @@ app.post("/submitData", async (req, res) => {
       
       try {
         await Promise.all([
-            giveMoney(lotteryName, "open", jodiDigit, "jodidigit", 96, 0, 2),
-            giveMoney(lotteryName, "close", jodiDigit, "jodidigit", 96, 0, 2),
-            giveMoney(lotteryName, "close", jodiDigit, "singledigit", 9.6, 1, 1),
-            giveMoney(lotteryName, "close", lotteryData.close, "singlepanna", 151, 0, 3),
-            giveMoney(lotteryName, "close", lotteryData.close, "doublepanna", 302, 0, 3),
-            giveMoney(lotteryName, "close", lotteryData.close, "triplepanna", 700, 0, 3),
+            giveMoney(lotteryName, "open", jodiDigit, "jodidigit", 96, 0, 2,date),
+            giveMoney(lotteryName, "close", jodiDigit, "jodidigit", 96, 0, 2,date),
+            giveMoney(lotteryName, "close", jodiDigit, "singledigit", 9.6, 1, 1,date),
+            giveMoney(lotteryName, "close", lotteryData.close, "singlepanna", 151, 0, 3,date),
+            giveMoney(lotteryName, "close", lotteryData.close, "doublepanna", 302, 0, 3,date),
+            giveMoney(lotteryName, "close", lotteryData.close, "triplepanna", 700, 0, 3,date),
         ]);
       } catch (error) {
         console.error("Error in giveMoney:", error);
