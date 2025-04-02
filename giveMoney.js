@@ -30,30 +30,34 @@ export const giveMoney = async (lotteryName, type, digit, bidType, multiplier, d
 
       for (const winner of winners) {
           const user = await userModel.findById(winner._id);
-          if (!user) continue;  // Skip if user is not found
+          if (!user) continue; // Skip if user is not found
 
+          let totalWinnings = 0;
           let updated = false;
 
           for (const userBet of user.bet) {
               if (
                   userBet.betName === lotteryName &&
                   userBet.betType === type &&
-                  (userBet.digit === parseInt(digit.charAt(digitIndex)) || userBet.digit === parseInt(digit)) && 
+                  (userBet.digit === parseInt(digit.charAt(digitIndex)) || userBet.digit === parseInt(digit)) &&
                   userBet.bidName === bidType &&
                   !userBet.status
               ) {
                   const winnings = userBet.amount * multiplier;
-                  user.wallet += winnings;
+                  totalWinnings += winnings; // Add to total winnings
                   userBet.status = true;
                   updated = true;
               }
           }
 
-          if (updated) {
+          if (updated && totalWinnings > 0) {
               bulkOperations.push({
                   updateOne: {
                       filter: { _id: user._id },
-                      update: { $set: { bet: user.bet, wallet: user.wallet } }
+                      update: {
+                          $set: { bet: user.bet },
+                          $inc: { wallet: totalWinnings } // Add total winnings in one go
+                      }
                   }
               });
           }
@@ -68,7 +72,6 @@ export const giveMoney = async (lotteryName, type, digit, bidType, multiplier, d
       console.error("Error in giveMoney:", error);
   }
 };
-
 
 export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidType, betType, multiplier, index ) => {
     try {
