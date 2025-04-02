@@ -3,68 +3,52 @@ import { userModel } from "./userSchema.js";
 
 export const giveMoney = async (lotteryName, type, digit, bidType, multiplier, digitIndex, numbers, date) => {
   try {
-      const winners = await userModel.aggregate([
-          { $unwind: "$bet" },
-          {
-              $match: {
-                  "bet.betName": lotteryName,
-                  "bet.betType": type,
-                  "bet.bidName": bidType,
-                  "bet.date": date, // Ensure date matches
-                  $expr: {
-                      $eq: [
-                          { $toInt: { $substr: [digit, digitIndex, numbers] } }, 
-                          "$bet.digit"
-                      ]
-                  }
+    const winners = await userModel.aggregate([
+      { $unwind: "$bet" },
+      {
+        $match: {
+          "bet.betName": lotteryName,
+          "bet.betType": type,
+          "bet.bidName": bidType,
+          "bet.date": date,
+          $expr: {
+            $eq: [
+              "$bet.digit",
+              {
+                $toInt: {
+                  $substrCP: [digit, digitIndex, numbers] // More reliable for handling substrings
+                }
               }
+            ]
           }
-      ]);
-
-      if (!winners.length) {
-          console.log("No winners found for", lotteryName, type, bidType);
-          return;
+        }
       }
+    ]);
 
-      const bulkOperations = [];
+    if (!winners.length) {
+      console.log("No winners found for", lotteryName, type, bidType);
+      return;
+    }
 
-      for (const winner of winners) {
-          const user = await userModel.findById(winner._id);
-          if (!user) continue; // Skip if user is not found
+    const bulkOperations = winners.map((winner) => {
+      const winningAmount = winner.bet.amount * multiplier;
+      return {
+        updateOne: {
+          filter: { _id: winner._id },
+          update: { $inc: { wallet: winningAmount } } // Increment wallet balance
+        }
+      };
+    });
 
-          let totalWinnings = 0;
-
-          for (const userBet of user.bet) {
-              if (
-                  userBet.betName === lotteryName &&
-                  userBet.betType === type &&
-                  userBet.date === date && // Ensure date matches
-                  (userBet.digit === parseInt(digit.charAt(digitIndex)) || userBet.digit === parseInt(digit)) &&
-                  userBet.bidName === bidType
-              ) {
-                  totalWinnings += userBet.amount * multiplier; // Calculate total winnings
-              }
-          }
-
-          if (totalWinnings > 0) {
-              bulkOperations.push({
-                  updateOne: {
-                      filter: { _id: user._id },
-                      update: { $inc: { wallet: totalWinnings } } // Add winnings in one update
-                  }
-              });
-          }
-      }
-
-      // Perform batch update for efficiency
-      if (bulkOperations.length > 0) {
-          await userModel.bulkWrite(bulkOperations);
-          console.log(`${bulkOperations.length} users updated successfully.`);
-      }
+    if (bulkOperations.length > 0) {
+      await userModel.bulkWrite(bulkOperations);
+      console.log("Wallets updated successfully!");
+    }
   } catch (error) {
-      console.error("Error in giveMoney:", error);
+    console.error("Error in giveMoney:", error);
   }
 };
+
 
 
 export const giveMoneyToSangam = async (lotteryName, closeDigit, openDigit, bidType, betType, multiplier, index ) => {
