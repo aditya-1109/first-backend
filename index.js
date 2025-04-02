@@ -422,7 +422,7 @@ app.post("/submitData", async (req, res) => {
       // Payout for "open" bets
       try {
         await Promise.allSettled([
-          giveMoney(lotteryName, "open", jodiDigit, "singleDigit", 9.8, 0, 1),
+          giveMoney(lotteryName, "open", jodiDigit, "singledigit", 9.8, 0, 1),
           giveMoney(lotteryName, "open", lotteryData.open, "singlepanna", 151, 0, 3),
           giveMoney(lotteryName, "open", lotteryData.open, "doublepanna", 302, 0, 3),
           giveMoney(lotteryName, "open", lotteryData.open, "triplepanna", 700, 0, 3),
@@ -446,9 +446,9 @@ app.post("/submitData", async (req, res) => {
       
       try {
         await Promise.allSettled([
-            giveMoney(lotteryName, "open", jodiDigit, "jodiDigit", 96, 0, 2),
-            giveMoney(lotteryName, "close", jodiDigit, "jodiDigit", 96, 0, 2),
-            giveMoney(lotteryName, "close", jodiDigit, "singleDigit", 9.6, 1, 1),
+            giveMoney(lotteryName, "open", jodiDigit, "jodidigit", 96, 0, 2),
+            giveMoney(lotteryName, "close", jodiDigit, "jodidigit", 96, 0, 2),
+            giveMoney(lotteryName, "close", jodiDigit, "singledigit", 9.6, 1, 1),
             giveMoney(lotteryName, "close", lotteryData.close, "singlepanna", 302, 0, 3),
             giveMoney(lotteryName, "close", lotteryData.close, "doublepanna", 302, 0, 3),
             giveMoney(lotteryName, "close", lotteryData.close, "triplepanna", 700, 0, 3),
