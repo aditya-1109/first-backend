@@ -124,16 +124,12 @@ app.post("/transferAmount", async (req, res) => {
 app.post("/updateUser", async (req, res) => {
     const { number, name, email, password, mobile } = req.body;
 
+    try {
     const existingUser = await userModel.findOne({
         $or: [{ email }, { number: mobile }],
     });
     if (existingUser) {
-        return res.status(200).send({ success: false, message: "Email or mobile number already registered." });
-    }
-    try {
-
-        const user = await userModel.findOne({ number });
-        if (user) {
+        
             if (name) {
                 user.name = name;
             }
@@ -154,9 +150,9 @@ app.post("/updateUser", async (req, res) => {
             }
 
             await user.save();
-            res.status(200).send({ success: true, message: "successfully updated" })
+            res.status(200).send({ success: true, message: "successfully updated", user })
         } else {
-            res.status(200).send({ success: false, message: "couldn't find you" })
+            res.status(200).send({ success: false, message: "couldn't find you!" , user})
         }
 
     } catch (e) {
