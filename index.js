@@ -122,11 +122,11 @@ app.post("/transferAmount", async (req, res) => {
 
 
 app.post("/updateUser", async (req, res) => {
-    const { number, name, email, password, mobile } = req.body;
+    const { name, email, mobile, number, password} = req.body;
 
     try {
     const existingUser = await userModel.findOne({
-        $or: [{ email }, { number: mobile }],
+        becryptPassword: number
     });
     if (existingUser) {
         
